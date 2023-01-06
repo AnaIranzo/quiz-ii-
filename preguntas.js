@@ -83,6 +83,7 @@ if (document.title == "Hoja de preguntas") {
     //console.log(num)
     if (num == 10) {
       console.log(puntuacion, "puntuacion num10");
+      
 
       let user = {
         score: puntuacion,
@@ -98,8 +99,9 @@ if (document.title == "Hoja de preguntas") {
       //console.log(nuevoDato,'2')
       arrayDatos = JSON.stringify(nuevoDato);
       localStorage.setItem("partida", arrayDatos);
+      
 
-      guardarPartida(today,puntuacion)
+      
     }
 
     //return puntuacion;
@@ -117,9 +119,11 @@ if (document.title == "Hoja de preguntas") {
 if (document.title == "Results") {
   let puntuacionTotal = JSON.parse(localStorage.getItem("partida"));
   console.log(puntuacionTotal);
+  
   document.getElementById(
     "datosguardados"
   ).innerHTML = `<div>${puntuacionTotal[0].score}/10</div>`;
+  
   let arrFechas = [];
   let arrPuntuaciones = [];
 
@@ -169,7 +173,7 @@ if (document.title == "Results") {
     //localStorage.clear()
     window.location.href = "./index.html";
   };
-}
+
 
 //FIREBASE
 const firebaseConfig = {
@@ -186,10 +190,10 @@ firebase.initializeApp(firebaseConfig);// Inicializaar app Firebase
 const db = firebase.firestore();// db representa mi BBDD //inicia Firestore
 
 
-function guardarPartida(today,puntuacion) {
-  return db.collection("score").add({
-    date: today,
-    score: puntuacion,
+
+db.collection("score").add({
+    date: puntuacionTotal[0].date,
+    score: puntuacionTotal[0].score,
     
   })
   .then((docRef) => {
@@ -198,7 +202,7 @@ function guardarPartida(today,puntuacion) {
   .catch((error) => {
     console.error("Error adding document: ", error);
   });
-}
+
 
 function obtenerPartida() {
   db.collection("score").get().then((querySnapshot) => {
@@ -206,4 +210,5 @@ function obtenerPartida() {
         console.log(`${doc.id} => ${doc.data()}`);//arrays graficas
     });
 });
+}
 }
