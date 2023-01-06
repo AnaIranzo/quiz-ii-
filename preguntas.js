@@ -1,3 +1,17 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyDn9yTVECEBbcGdVrHFSsq52iWlucrlCUc",
+  authDomain: "quiz-ii-61c29.firebaseapp.com",
+  projectId: "quiz-ii-61c29",
+  storageBucket: "quiz-ii-61c29.appspot.com",
+  messagingSenderId: "809325604160",
+  appId: "1:809325604160:web:b972fa210671931f6a5ea5"
+};
+
+firebase.initializeApp(firebaseConfig);// Inicializaar app Firebase
+
+const db = firebase.firestore();// db representa mi BBDD //inicia Firestore
+
+
 if (document.title == "Hoja de preguntas") {
   async function getQuestions() {
     let resultado = await fetch("https://opentdb.com/api.php?amount=10");
@@ -10,6 +24,7 @@ if (document.title == "Hoja de preguntas") {
   async function init() {
     let pregunta = await getQuestions();
     let num = 0;
+ 
     nextQuestion(pregunta[num], num);
     num = 1;
     console.log(pregunta);
@@ -18,6 +33,9 @@ if (document.title == "Hoja de preguntas") {
       num++;
       //console.log(num,'num++')
     });
+ 
+    
+  
   }
 
   init();
@@ -51,14 +69,22 @@ if (document.title == "Hoja de preguntas") {
       }
 
       opciones.innerHTML = imprimir2;
-    } else {
-      window.location.href = "./results.html";
+    } else{
+      document.querySelector("#btn").setAttribute("value","Results")
+      document.querySelector("#btn").addEventListener("click", () => {
+        
+        window.location.href = "./results.html";
+      })
+
+
+      //window.location.href = "./results.html";
     }
     validar(pregunta, num);
   }
 
   let puntuacion = 0;
   let today = new Date().toLocaleDateString();
+  
   /* let arrayDatos = []
   localStorage.setItem('partida', JSON.stringify(arrayDatos)) */
 
@@ -70,7 +96,7 @@ if (document.title == "Hoja de preguntas") {
         //console.log(event.target.value);
         //let counter = 0;
 
-        //console.log("Estoy por "+ num);
+        console.log("Estoy por "+ num);
         let selected = event.target.value;
 
         if (selected === pregunta.correct_answer) {
@@ -79,9 +105,16 @@ if (document.title == "Hoja de preguntas") {
           console.log(puntuacion,'puntuacion')
           
         }
+      
       });
     //console.log(num)
-    if (num == 10) {
+      if (num == 10) {
+        addFirestore(today, puntuacion)
+
+      };
+    
+      //Local storage
+      /* 
       console.log(puntuacion, "puntuacion num10");
       
 
@@ -98,13 +131,16 @@ if (document.title == "Hoja de preguntas") {
 
       //console.log(nuevoDato,'2')
       arrayDatos = JSON.stringify(nuevoDato);
-      localStorage.setItem("partida", arrayDatos);
+      localStorage.setItem("partida", arrayDatos); 
+      }
       
-
+    */
+      
+    //return puntuacion;
       
     }
-
-    //return puntuacion;
+    
+    
   }
 
   function mezclarArray(arr) {
@@ -113,11 +149,89 @@ if (document.title == "Hoja de preguntas") {
       [arr[i], arr[s]] = [arr[s], arr[i]];
     }
   }
-}
 
+  function addFirestore(today, puntuacion) {
+    return db.collection("score").add({
+      
+      date: today,
+      score: puntuacion,
+      
+    })
+    .then((docRef) => {
+      console.log("Document written with ID: ", docRef.id);
+    
+      
+    })
+    .catch((error) => {
+      console.error("Error adding document: ", error);
+    });
+  }
+
+  function getFirestore() {
+    return db.collection("score").orderBy("date").get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+          console.log(`${doc.id} => ${doc.data().score},${doc.data().date}`);
+          document.getElementById(
+            "datosguardados"
+          ).innerHTML = `<div>${doc.id}/10</div>`;
+      });
+  });
+
+ /*      return db.collection("score").orderBy("date").get().then((doc) => {
+      if (doc.exists) {
+          console.log("Document data:", doc.data());
+          
+      } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+      }
+  }).catch((error) => {
+      console.log("Error getting document:", error);
+  }); */
+
+    
+    
+    /* return db.collection("score")
+    .get().then((querySnapshot) => {
+
+      const scores = [];
+
+        db.collection("score").get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            scores.unshift(doc.data().score);
+          });
+        
+        });
+      
+      querySnapshot.forEach((doc) => {
+        console.log(doc)
+        console.log(doc.data()) 
+        console.log(`${doc.id} => ${doc.data().score}, ${doc.data().date} `);//arrays graficas
+        console.log(scores);
+      
+      
+      }); 
+      document.getElementById(
+        "datosguardados"
+      ).innerHTML = `<div>${score}/10</div>`;
+
+    }) */}
+
+    
 //GRÁFICA
 if (document.title == "Results") {
-  let puntuacionTotal = JSON.parse(localStorage.getItem("partida"));
+
+  getFirestore()
+  
+  
+
+
+
+
+  
+
+  //Sacar puntuacion de local storage y grafica
+  /* let puntuacionTotal = JSON.parse(localStorage.getItem("partida"));
   console.log(puntuacionTotal);
   
   document.getElementById(
@@ -165,50 +279,15 @@ if (document.title == "Results") {
           style: "stroke-width: 10px",
         });
       }
-    });
+    });*/
   
-  //Lo siguiente hace un clear del local storage, lo cuál sólo sirve si no queremos hacer registro de varios (sólo uno)-TEMPORAL
+  //Lleva a home
   const botonDelete = document.querySelector("#btnResults");
   botonDelete.onclick = () => {
     //localStorage.clear()
     window.location.href = "./index.html";
-  };
-
-
-//FIREBASE
-const firebaseConfig = {
-  apiKey: "AIzaSyDn9yTVECEBbcGdVrHFSsq52iWlucrlCUc",
-  authDomain: "quiz-ii-61c29.firebaseapp.com",
-  projectId: "quiz-ii-61c29",
-  storageBucket: "quiz-ii-61c29.appspot.com",
-  messagingSenderId: "809325604160",
-  appId: "1:809325604160:web:b972fa210671931f6a5ea5"
-};
-
-firebase.initializeApp(firebaseConfig);// Inicializaar app Firebase
-
-const db = firebase.firestore();// db representa mi BBDD //inicia Firestore
+  }; 
 
 
 
-db.collection("score").add({
-    date: puntuacionTotal[0].date,
-    score: puntuacionTotal[0].score,
-    
-  })
-  .then((docRef) => {
-    console.log("Document written with ID: ", docRef.id);
-  })
-  .catch((error) => {
-    console.error("Error adding document: ", error);
-  });
-
-
-function obtenerPartida() {
-  db.collection("score").get().then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`);//arrays graficas
-    });
-});
-}
 }
