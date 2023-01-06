@@ -24,7 +24,6 @@ if (document.title == "Hoja de preguntas") {
   async function init() {
     let pregunta = await getQuestions();
     let num = 0;
- 
     nextQuestion(pregunta[num], num);
     num = 1;
     console.log(pregunta);
@@ -33,8 +32,6 @@ if (document.title == "Hoja de preguntas") {
       num++;
       //console.log(num,'num++')
     });
- 
-    
   
   }
 
@@ -83,7 +80,7 @@ if (document.title == "Hoja de preguntas") {
   }
 
   let puntuacion = 0;
-  let today = new Date().toLocaleDateString();
+  let today = new Date().toLocaleString();
   
   /* let arrayDatos = []
   localStorage.setItem('partida', JSON.stringify(arrayDatos)) */
@@ -115,9 +112,9 @@ if (document.title == "Hoja de preguntas") {
     
       //Local storage
       /* 
+      tiene que ir dentro del if 
       console.log(puntuacion, "puntuacion num10");
       
-
       let user = {
         score: puntuacion,
         date: today,
@@ -128,7 +125,6 @@ if (document.title == "Hoja de preguntas") {
       //console.log(nuevoDato, '1')
 
       nuevoDato.unshift(user);
-
       //console.log(nuevoDato,'2')
       arrayDatos = JSON.stringify(nuevoDato);
       localStorage.setItem("partida", arrayDatos); 
@@ -167,69 +163,69 @@ if (document.title == "Hoja de preguntas") {
     });
   }
 
+  let arrFechas = [];
+  let arrPuntuaciones = [];
+
   function getFirestore() {
-    return db.collection("score").orderBy("date").get().then((querySnapshot) => {
+      return db.collection("score").orderBy("date").get().then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-          console.log(`${doc.id} => ${doc.data().score},${doc.data().date}`);
+          console.log(`${doc.id} => ${doc.data().score} => ${doc.data().date}`);
+          
+          arrPuntuaciones.push(doc.data().score);
+          let fechas = doc.data().date;
+          //fechas = fechas.substring(0, 6);
+          arrFechas.push(fechas);
+          
+
+          console.log(arrPuntuaciones);
+          console.log(arrFechas);
+
           document.getElementById(
             "datosguardados"
-          ).innerHTML = `<div>${doc.id}/10</div>`;
+          ).innerHTML = `<div>${doc.data().score}/10</div>`;
+      });
+      new Chartist.Bar(
+        "#puntuaciones",
+        {
+          labels: arrFechas,
+          series: [arrPuntuaciones],
+        },
+        {
+          width: 350,
+          height: 250,
+          horizontalBars: true,
+          //seriesBarDistance: 5,
+          axisX: {
+            offset: 10,
+            onlyInteger: true,
+          },
+          axisY: {
+            onlyInteger: true,
+            offset: 80,
+            labelInterpolationFnc: function (value) {
+              return value + "";
+            },
+          },
+        }
+      ).on("draw", function (data) {
+        if (data.type === "bar") {
+          data.element.attr({
+            style: "stroke-width: 10px",
+          });
+        }
       });
   });
 
- /*      return db.collection("score").orderBy("date").get().then((doc) => {
-      if (doc.exists) {
-          console.log("Document data:", doc.data());
-          
-      } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-      }
-  }).catch((error) => {
-      console.log("Error getting document:", error);
-  }); */
-
     
-    
-    /* return db.collection("score")
-    .get().then((querySnapshot) => {
+  };
 
-      const scores = [];
-
-        db.collection("score").get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            scores.unshift(doc.data().score);
-          });
-        
-        });
-      
-      querySnapshot.forEach((doc) => {
-        console.log(doc)
-        console.log(doc.data()) 
-        console.log(`${doc.id} => ${doc.data().score}, ${doc.data().date} `);//arrays graficas
-        console.log(scores);
-      
-      
-      }); 
-      document.getElementById(
-        "datosguardados"
-      ).innerHTML = `<div>${score}/10</div>`;
-
-    }) */}
-
-    
 //GRÁFICA
 if (document.title == "Results") {
 
   getFirestore()
-  
-  
-
-
-
 
   
-
+  
   //Sacar puntuacion de local storage y grafica
   /* let puntuacionTotal = JSON.parse(localStorage.getItem("partida"));
   console.log(puntuacionTotal);
