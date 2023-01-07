@@ -57,7 +57,7 @@ if (document.title == "Hoja de preguntas") {
       let imprimir2 = "";
 
       for (let j = 0; j < arrMezcla.length; j++) {
-        imprimir2 += `<div>
+        imprimir2 += `<div id="formatoRespuestas">
           <input type="radio" id="radio${num + j}" name="${num}" value="${
           arrMezcla[j]
         }"> 
@@ -175,10 +175,6 @@ if (document.title == "Hoja de preguntas") {
           let fechas = doc.data().date;
           //fechas = fechas.substring(0, 6);
           arrFechas.push(fechas);
-          
-
-          console.log(arrPuntuaciones);
-          console.log(arrFechas);
 
           document.getElementById(
             "datosguardados"
