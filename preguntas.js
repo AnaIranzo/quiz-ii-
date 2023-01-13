@@ -213,14 +213,14 @@ if (document.title == "Hoja de preguntas") {
        
         const sortByDate = arr => {
           const sorter = (a, b) => {
-             return new Date(b.date).getTime() - new Date(a.date).getTime();
+              return new Date(b.date).getTime() - new Date(a.date).getTime();
           }
           arr.sort(sorter);
-       };
-       sortByDate(arrData);
-       console.log(arrData);
+        };
+      sortByDate(arrData);
+      console.log(arrData);
         
-       arrData.forEach((data) => {
+        arrData.forEach((data) => {
         arrPuntuaciones.unshift(data.date)
         arrFechas.unshift(data.score)
        })
